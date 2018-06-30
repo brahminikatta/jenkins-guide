@@ -1,15 +1,9 @@
 pipeline {
     environment {
-      DOCKER = credentials('docker-hub-credentials')
+      DOCKER = credentials('docker-hub')
     }
   agent any
-    
   stages {
-      stage('Push to Docker Registry'){
-        withCredentials([usernamePassword(credentialsId: 'dockerHubAccount', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
-            pushToImage(USERNAME, PASSWORD)
-        }
-    
 // Building your Test Images
     stage('BUILD') {
       parallel {
@@ -37,18 +31,18 @@ pipeline {
       parallel {
         stage('Mocha Tests') {
           steps {
-            sh 'docker run --name nodeapp-dev --net="bridge" -d \
+            sh 'docker run --name nodeapp-dev --network="bridge" -d \
             -p 9000:9000 nodeapp-dev:trunk'
-            sh 'docker run --name test-image -v $PWD:/JUnit --net="bridge" \
+            sh 'docker run --name test-image -v $PWD:/JUnit --network="bridge" \
             --link=nodeapp-dev -d -p 9001:9000 \
             test-image:latest'
           }
         }
         stage('Quality Tests') {
           steps {
-            sh ' docker login --username $DOCKER_USR --password $DOCKER_PSW'
-            sh ' docker tag nodeapp-dev:trunk <DockerHub Username>/nodeapp-dev:latest'
-            sh ' docker push <DockerHub Username>/nodeapp-dev:latest'
+            sh 'docker login --username $DOCKER_USR --password $DOCKER_PSW'
+            sh 'docker tag nodeapp-dev:trunk <DockerHub Username>/nodeapp-dev:latest'
+            sh 'docker push <DockerHub Username>/nodeapp-dev:latest'
           }
         }
       }
@@ -104,5 +98,4 @@ pipeline {
       }
     }
   }
-}
 }
