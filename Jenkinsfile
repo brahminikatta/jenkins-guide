@@ -3,7 +3,13 @@ pipeline {
       DOCKER = credentials('docker-hub-credentials')
     }
   agent any
+    
   stages {
+      stage('Push to Docker Registry'){
+        withCredentials([usernamePassword(credentialsId: 'dockerHubAccount', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
+            pushToImage(USERNAME, PASSWORD)
+        }
+    
 // Building your Test Images
     stage('BUILD') {
       parallel {
