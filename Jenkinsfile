@@ -27,7 +27,7 @@ pipeline {
       }
     }
 // Performing Software Tests
-stage('TEST') {
+    stage('TEST') {
       parallel {
         stage('Mocha Tests') {
           steps {
@@ -52,7 +52,8 @@ stage('TEST') {
         }
         unstable {
             echo 'This build returned an unstable status.'
-        }failure {
+        }
+        failure {
             echo 'This build has failed. See logs for details.'
         }
       }
@@ -77,8 +78,8 @@ stage('TEST') {
                     sh 'docker stop nodeapp-dev test-image'
                     sh 'docker system prune -f'
                     deleteDir()
-                } 
-}
+                }
+            }
     }
 // JUnit reports and artifacts saving
     stage('REPORTS') {
